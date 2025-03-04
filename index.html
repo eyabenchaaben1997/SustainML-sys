@@ -3,202 +3,1288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Interface</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>SustainML Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background-color: #4A4A4A;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .sidebar p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+
+        .main-container {
+            width: calc(100% - 250px); /* Prend en compte la sidebar */
+            max-width: 1400px;
+            margin-left: 250px;
+            position: relative;
+        }
+
+        /* Superior Grid */
+        .superior-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; /* Adjust spacing */
+            padding: 20px;
+            background-color: #dfe7ec; /* Light blueish-gray background */
+            border-radius: 12px; /* Soft rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+            margin: 20px auto; /* Center it */
+            width: 90%; /* Responsive width */
+        }
+
+        .data-source {
+            width: 250px; /* Adjusted width */
+            height: 180px; /* Match Data Selection */
+            background-color: #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .data-source h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .drag-drop-search {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .drag-drop {
+            font-size: 16px;
+            color: #333;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .drag-drop:hover {
+            color: #007BFF;
+        }
+
+        .drag-drop-search label,
+        .drag-drop-search span,
+        .search-bar {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .data-selection {
+            width: 400px; /* Increased width */
+            height: 180px; /* Keep the same height */
+            background-color: #e5edf2;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+
+        .hidden {
+            display: none;
+        }
+
+        /* Table Wrapper */
+        .table-wrapper {
+            max-height: 140px;
+            overflow: auto;
+        }
+
+        /* Arrow Styling */
+        .arrow {
+            margin: 0 10px;
+        }
+
+        .submit-section {
+            display: flex;
+            align-items: center;
+        }
+
+        #submit-btn {
+            background-color: gray;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: not-allowed;
+        }
+
+        .table-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #d4dce2;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #aaa;
+        }
+
+
+        .table-container::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #aaa;
+            border-radius: 10px;
+        }
+
+        /*  Responsive Fix */
+        @media (max-width: 768px) {
+            .table-container {
+                max-width: 100%;
+            }
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+        }
+
+        .search-bar input {
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            outline: none;
+            width: 200px;
+            background-color: transparent;
+        }
+
+        .search-button {
+            border: none;
+            background-color: transparent;
+            padding: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-button img {
+            width: 20px;
+            height: 20px;
+            filter: invert(50%);
+        }
+
+        .search-button:hover img {
+            filter: invert(30%) sepia(1) saturate(10) hue-rotate(200deg);
+        }
+
+        span {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .arrow img {
+
+            width: 70px; /* Larger arrow size */
+            height: auto;
+            display: block;
+            margin: auto;
+        }
+
+        .arrow {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        /* Data Selection Container */
+        .data-selection {
+            background-color: #e5edf2;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        /* Title and Buttons (Select All & Deselect All) */
+        .data-selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-selection.empty {
+            opacity: 0.6;
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+        }
+
+       .inferior-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+            padding: 20px;
+        }
+
+        /*  Section Geo Location & Hardware */
+        .geo-hardware {
+            background-color: #d6e8e8;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: none;
+            position: relative;
+        }
+
+        /*  Section Goal & Optional */
+        .goal-domain {
+            background-color: #edd9e5; /* Couleur rose */
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: none;
+            position: relative;
+        }
+
+
+        /*  Geo Location & Hardware */
+        .geo-list, .hardware-list {
+            width: 45%;
+            padding: 10px;
+            background-color: #d0e8e0; /* ✅ Change to a light greenish color */
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px auto;
+
+        }
+
+        /*  Goal & Optional */
+        .goal-list, .optional-list {
+            width: 45%;
+            padding: 10px;
+            background-color: #f1d4e5; /* ✅ Change to a light pinkish color */
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px auto;
+
+        }
+
+
+
+        .geo-list { transform: translateX(-80px); }
+        .hardware-list { transform: translateX(80px); }
+        .goal-list { transform: translateX(-80px); }
+        .optional-list { transform: translateX(80px); }
+
+
+        .geo-hardware h3, .goal-domain h3 {
+            text-align: center;  /* Center titles */
+            margin-bottom: 10px; /* Adds space below */
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .option {
+            margin-bottom: 5px;
+        }
+
+
+        .option select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+            height: 28px;
+        }
+
+
+        @media (max-width: 768px) {
+            .inferior-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .geo-list, .hardware-list, .goal-list, .optional-list {
+                transform: none;
+                width: 90%;
+            }
+
+            .geo-hardware h3,
+            .hardware-availability h3,
+            .goal-domain h3,
+            .optional-section h3 {
+                left: 0;
+
+            }
+        }
+
+        .diagram-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+
+        .circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-align: center;
+            position: absolute;
+        }
+
+
+        .provide-data {
+            background-color: #1f4b67;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+
+        .describe-problem {
+            background-color: #7c3a4f;
+            right: -150px;
+            bottom: -50px;
+        }
+
+        /* Cercle de l'environnement */
+        .define-environment {
+            background-color: #899955;
+            left: -150px;
+            bottom: -50px;
+        }
+
+        /* Select All & Deselect All Buttons */
+        .table-controls button {
+            background-color: #007BFF;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        .table-controls button:hover {
+            background-color: #ddd;
+        }
+
+        /* Hide the buttons initially */
+        .table-controls, .data-preparation {
+            display: none;
+        }
+
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #007bff;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Data Preparation Button */
+        .data-preparation {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .data-preparation button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .data-preparation button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Hidden State */
+        .hidden {
+            display: none;
+        }
+
+        /* Result Box */
+        .result-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 350px;
+        }
+
+        .result-box h3 {
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .result-box p {
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .result-box button {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .result-box button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
 </head>
 <body>
-    <!-- Main interface -->
-    <div id="main-interface">
-        <div id="info-icon">i</div>
-        <div class="circle-container">
-            <div class="circle data-circle" id="data-circle">Data</div>
-            <div class="circle pd-circle" id="pd-circle">PD</div>
-            <div class="circle env-circle" id="env-circle">Environment</div>
+
+    <div class="main-container">
+
+        <div class="sidebar">
+            <h2>About the System</h2>
+            <p>Hover over a section to see details.</p>
         </div>
+
+
+        <!-- Superior Grid -->
+        <div class="superior-grid">
+            <!-- Data Source (Smaller & Aligned) -->
+            <div class="data-source">
+                <h3>Data Source</h3>
+                <div class="drag-drop-search">
+                    <label for="file-input" class="drag-drop">Drag and drop</label>
+                    <br> <!-- New Line -->
+                    <span>or</span>
+                    <br> <!-- New Line -->
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search Huggingface" id="search-bar">
+                        <button class="search-button">
+                            <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search Icon">
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="file-input" hidden>
+            </div>
+
+            <!-- First Arrow (Between Data Source & Data Selection) -->
+            <div class="arrow">
+                <img src="arrow.png" alt="Arrow">
+            </div>
+
+            <!-- Data Selection (Smaller Width, Same Height as Data Source) -->
+            <div class="data-selection" id="data-selection">
+                <h3>Data Selection</h3>
+                <p id="no-data-text">No data selected yet.</p> <!-- Hide when data is uploaded -->
+                <div class="table-wrapper">
+                    <div class="table-container">
+                        <table id="data-table">
+                            <thead>
+                                <tr id="table-header"></tr> <!-- Dynamic headers inserted here -->
+                            </thead>
+                            <tbody id="table-body"></tbody> <!-- Dynamic rows inserted here -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Arrow (Between Data Selection & Submit) -->
+            <div class="arrow">
+                <img src="arrow.png" alt="Arrow">
+            </div>
+
+            <!-- Submit Button (Initially Disabled) -->
+            <div class="submit-section">
+                <button id="submit-btn" disabled>Submit</button>
+            </div>
+
+            <div id="resulted-model" class="result-box hidden">
+                <h3>Resulted Model</h3>
+                <p><strong>Model Name:</strong> <span id="model-name">-</span></p>
+                <p><strong>Task:</strong> <span id="model-task">-</span></p>
+                <p><strong>Problem Definition:</strong> <span id="model-problem">-</span></p>
+                <p><strong>Hardware:</strong> <span id="model-hardware">-</span></p>
+                <p><strong>Programming Language:</strong> <span id="model-language">-</span></p>
+                <button id="download-model">Download Model</button>
+            </div>
+        </div>
+
+
+
+        <div class="diagram-container">
+            <div class="diagram">
+                <div class="circle provide-data">Provide Data <br> 0kg</div>
+                <div class="circle describe-problem">Describe Problem <br> 0kg</div>
+                <div class="circle define-environment">Define Environment <br> 0kg</div>
+
+            </div>
+        </div>
+
+           <div class="inferior-grid">
+        <!-- 🌍 Geo Location et Hardware Availability -->
+        <div class="geo-hardware grid-item" id="geo-location">
+            <!-- Geo Location -->
+            <h3>Geo Location</h3>
+            <div class="geo-list">
+                <div class="option">
+                    <label>Your location</label>
+                     <select id="country-select">
+                        <option value="">Select a country</option>
+                        <option value="Afghanistan">Afghanistan</option>
+                        <option value="Albania">Albania</option>
+                        <option value="Algeria">Algeria</option>
+                        <option value="Andorra">Andorra</option>
+                        <option value="Angola">Angola</option>
+                        <option value="Antigua and Barbuda">Antigua and Barbuda</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="Armenia">Armenia</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Austria">Austria</option>
+                        <option value="Azerbaijan">Azerbaijan</option>
+                        <option value="Bahamas">Bahamas</option>
+                        <option value="Bahrain">Bahrain</option>
+                        <option value="Bangladesh">Bangladesh</option>
+                        <option value="Barbados">Barbados</option>
+                        <option value="Belarus">Belarus</option>
+                        <option value="Belgium">Belgium</option>
+                        <option value="Belize">Belize</option>
+                        <option value="Benin">Benin</option>
+                        <option value="Bhutan">Bhutan</option>
+                        <option value="Bolivia">Bolivia</option>
+                        <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                        <option value="Botswana">Botswana</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Brunei">Brunei</option>
+                        <option value="Bulgaria">Bulgaria</option>
+                        <option value="Burkina Faso">Burkina Faso</option>
+                        <option value="Burundi">Burundi</option>
+                        <option value="Cabo Verde">Cabo Verde</option>
+                        <option value="Cambodia">Cambodia</option>
+                        <option value="Cameroon">Cameroon</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Central African Republic">Central African Republic</option>
+                        <option value="Chad">Chad</option>
+                        <option value="Chile">Chile</option>
+                        <option value="China">China</option>
+                        <option value="Colombia">Colombia</option>
+                        <option value="Comoros">Comoros</option>
+                        <option value="Congo (Congo-Brazzaville)">Congo (Congo-Brazzaville)</option>
+                        <option value="Costa Rica">Costa Rica</option>
+                        <option value="Croatia">Croatia</option>
+                        <option value="Cuba">Cuba</option>
+                        <option value="Cyprus">Cyprus</option>
+                        <option value="Czech Republic">Czech Republic</option>
+                        <option value="Democratic Republic of the Congo">Democratic Republic of the Congo</option>
+                        <option value="Denmark">Denmark</option>
+                        <option value="Djibouti">Djibouti</option>
+                        <option value="Dominica">Dominica</option>
+                        <option value="Dominican Republic">Dominican Republic</option>
+                        <option value="Ecuador">Ecuador</option>
+                        <option value="Egypt">Egypt</option>
+                        <option value="El Salvador">El Salvador</option>
+                        <option value="Equatorial Guinea">Equatorial Guinea</option>
+                        <option value="Eritrea">Eritrea</option>
+                        <option value="Estonia">Estonia</option>
+                        <option value="Eswatini">Eswatini</option>
+                        <option value="Ethiopia">Ethiopia</option>
+                        <option value="Fiji">Fiji</option>
+                        <option value="Finland">Finland</option>
+                        <option value="France">France</option>
+                        <option value="Gabon">Gabon</option>
+                        <option value="Gambia">Gambia</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="Ghana">Ghana</option>
+                        <option value="Greece">Greece</option>
+                        <option value="Grenada">Grenada</option>
+                        <option value="Guatemala">Guatemala</option>
+                        <option value="Guinea">Guinea</option>
+                        <option value="Guinea-Bissau">Guinea-Bissau</option>
+                        <option value="Guyana">Guyana</option>
+                        <option value="Haiti">Haiti</option>
+                        <option value="Honduras">Honduras</option>
+                        <option value="Hungary">Hungary</option>
+                        <option value="Iceland">Iceland</option>
+                        <option value="India">India</option>
+                        <option value="Indonesia">Indonesia</option>
+                        <option value="Iran">Iran</option>
+                        <option value="Iraq">Iraq</option>
+                        <option value="Ireland">Ireland</option>
+                        <option value="Israel">Israel</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Jamaica">Jamaica</option>
+                        <option value="Japan">Japan</option>
+                        <option value="Jordan">Jordan</option>
+                        <option value="Kazakhstan">Kazakhstan</option>
+                        <option value="Kenya">Kenya</option>
+                        <option value="Kuwait">Kuwait</option>
+                        <option value="Kyrgyzstan">Kyrgyzstan</option>
+                        <option value="Laos">Laos</option>
+                        <option value="Latvia">Latvia</option>
+                        <option value="Lebanon">Lebanon</option>
+                        <option value="Lesotho">Lesotho</option>
+                        <option value="Liberia">Liberia</option>
+                        <option value="Libya">Libya</option>
+                        <option value="Lithuania">Lithuania</option>
+                        <option value="Luxembourg">Luxembourg</option>
+                        <option value="Madagascar">Madagascar</option>
+                        <option value="Malawi">Malawi</option>
+                        <option value="Malaysia">Malaysia</option>
+                        <option value="Maldives">Maldives</option>
+                        <option value="Mali">Mali</option>
+                        <option value="Malta">Malta</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Moldova">Moldova</option>
+                        <option value="Monaco">Monaco</option>
+                        <option value="Mongolia">Mongolia</option>
+                        <option value="Montenegro">Montenegro</option>
+                        <option value="Morocco">Morocco</option>
+                        <option value="Mozambique">Mozambique</option>
+                        <option value="Myanmar">Myanmar</option>
+                        <option value="Namibia">Namibia</option>
+                        <option value="Nepal">Nepal</option>
+                        <option value="Netherlands">Netherlands</option>
+                        <option value="New Zealand">New Zealand</option>
+                        <option value="Nicaragua">Nicaragua</option>
+                        <option value="Nigeria">Nigeria</option>
+                        <option value="North Korea">North Korea</option>
+                        <option value="Norway">Norway</option>
+                        <option value="Pakistan">Pakistan</option>
+                        <option value="Palestine">Palestine</option>
+                        <option value="Panama">Panama</option>
+                        <option value="Peru">Peru</option>
+                        <option value="Philippines">Philippines</option>
+                        <option value="Poland">Poland</option>
+                        <option value="Portugal">Portugal</option>
+                        <option value="Qatar">Qatar</option>
+                        <option value="Romania">Romania</option>
+                        <option value="Russia">Russia</option>
+                        <option value="Saudi Arabia">Saudi Arabia</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="Spain">Spain</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Vietnam">Vietnam</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                    </select>
+                                </div>
+                <div class="option">
+                    <label>Is the environment cloud-based or local</label>
+                    <select>
+                        <option>Local</option>
+                        <option>Cloud</option>
+                    </select>
+                </div>
+                <div class="option">
+                    <label>Are you open for using cloud-based service</label>
+                    <select>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Hardware Availability -->
+            <div class="geo-hardware grid-item" id="hardware">
+                <h3>Hardware Availability</h3>
+                <div class="hardware-list">
+                    <div class="option">
+                        <label>Hardware</label>
+                        <select>
+                            <option>GPU</option>
+                            <option>CPU</option>
+                            <option>TPU</option>
+                        </select>
+                    </div>
+                    <div class="option">
+                        <label>Memory and storage capacity</label>
+                        <select>
+                            <option>I know</option>
+                            <option>I don't know</option>
+                        </select>
+                    </div>
+                    <div class="option">
+                        <label>Are there any limitations on runtime or resources</label>
+                        <select>
+                            <option>Yes</option>
+                            <option>No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🎯 Goal and Domain -->
+        <div class="goal-domain grid-item" id="goal-domain">
+            <h3>Goal and Domain</h3>
+            <div class="goal-list">
+                <div class="option">
+                    <label>Data Modality</label>
+                    <select>
+                        <option>Image/Video</option>
+                        <option>Text</option>
+                        <option>Sensor</option>
+                    </select>
+                </div>
+                    <div class="option">
+                        <label for="task-select">Task:</label>
+                        <select id="task-select">
+                            <option value="">Select a Task</option>
+                        </select>
+                    </div>
+                <div class="option">
+                    <label for="problem-select">Problem Definition:</label>
+                    <select id="problem-select" disabled>
+                        <option value="">Select a Problem Definition</option>
+                    </select>
+                </div>
+            </div>
+
+
+
+            <div class="goal-domain grid-item" id="optional">
+                    <h3>Optional</h3>
+                    <div class="optional-list">
+                        <div class="option">
+                            <label>Domain</label>
+                            <select>
+                                <option>Health</option>
+                                <option>Agriculture</option>
+                                <option>Economics</option>
+                            </select>
+                        </div>
+                        <div class="option">
+                            <label for="library-select">Libraries</label>
+                            <select id="library-select">
+                                <option value="">Loading libraries...</option>
+                            </select>
+                        </div>
+                        <div class="option">
+                            <label>Programming Language</label>
+                            <select>
+                                <option>Python</option>
+                                <option>R</option>
+                                <option>Java</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </div>
 
-    <!-- PD section -->
-    <div id="pd-section" class="hidden">
-        <p>What's your data modality?</p>
-        <select id="modality-select">
-            <option value="">Select...</option>
-            <option value="Image/video">Image/video</option>
-            <option value="Text">Text</option>
-            <option value="Sensor">Sensor</option>
-            <option value="Audio">Audio</option>
-        </select>
-        <div id="problem-type-section" class="hidden">
-            <p>What's your problem type?</p>
-            <select id="problem-type-select"></select>
-        </div>
-        <div id="evaluation-metrics-section" class="hidden">
-            <p>What are your evaluation metrics?</p>
-            <select id="evaluation-metrics-select"></select>
-        </div>
-        <div id="model-section" class="hidden">
-            <p>Model's suggestion?</p>
-            <select id="model-select"></select>
-        </div>
-    </div>
-    <!-- Environment section -->
-    <div id="env-section" class="hidden">
-        <h2>Environment Information</h2>
-        <div class="environment-input">
-            <label for="hardware-input">What's your hardware?</label>
-            <input type="text" id="hardware-input" placeholder="e.g., CPU, GPU, RAM"/>
-        </div>
-        <div class="environment-input">
-            <label for="cloud-local-select">Where are you running the ML model?</label>
-            <select id="cloud-local-select">
-                <option value="">Select...</option>
-                <option value="Local">Local</option>
-                <option value="Cloud">Cloud</option>
-            </select>
-        </div>
-        <div class="environment-input">
-            <label for="location-input">What's your personal location?</label>
-            <input type="text" id="location-input" placeholder="e.g., City, Country"/>
-        </div>
-        <button id="submit-environment" class="response-button">Submit Environment Info</button>
-    </div>
 
-    <div id="navigation-overview" class="hidden">
-        <div class="circle-container small">
-            <div class="circle data-circle small-circle">Data</div>
-            <div class="circle pd-circle large-circle">PD</div>
-            <div class="circle env-circle small-circle">Environment</div>
-        </div>
     </div>
 
     <script>
-        document.getElementById('pd-section').style.display = 'none';
-        document.getElementById('navigation-overview').style.display = 'none';
-        document.getElementById('navigation-overview').style.display = 'none';
-        document.getElementById('info-icon').addEventListener('click', function() {
-            alert("Information: This interface contains three clickable circles named 'Data', 'PD', and 'Environment'. Click on a circle to get more information.");
-        });
 
-        document.getElementById('data-circle').addEventListener('click', function() {
-            window.location.href = 'data.html';
-        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const submitButton = document.getElementById("submit-btn");
+            const resultedModel = document.getElementById("resulted-model");
 
-        document.getElementById('pd-circle').addEventListener('click', function() {
-            document.getElementById('main-interface').style.display = 'none';
-            document.getElementById('pd-section').style.display = 'block';
-            document.getElementById('navigation-overview').style.display = 'block';
-        });
+            function checkFormCompletion() {
+                const location = document.getElementById("country-select").value;
+                const cloudOption = document.querySelector("#geo-location select:nth-of-type(2)").value;
+                const cloudUsage = document.querySelector("#geo-location select:nth-of-type(3)").value;
+                const hardware = document.querySelector("#hardware select:nth-of-type(1)").value;
+                const memory = document.querySelector("#hardware select:nth-of-type(2)").value;
+                const resources = document.querySelector("#hardware select:nth-of-type(3)").value;
+                const modality = document.querySelector("#goal-domain select:nth-of-type(1)").value;
+                const task = document.getElementById("task-select").value;
+                const problem = document.getElementById("problem-select").value;
+                const domain = document.querySelector("#optional select:nth-of-type(1)").value;
+                const library = document.getElementById("library-select").value;
+                const language = document.querySelector("#optional select:nth-of-type(3)").value;
 
-        document.getElementById('env-circle').addEventListener('click', function() {
-            document.getElementById('main-interface').style.display = 'none';
-            document.getElementById('env-section').style.display = 'block';
-            document.getElementById('navigation-overview').style.display = 'block';
-        });
+                
+                console.log("Checking form completion...");
+                console.log("Task:", task);
+                console.log("Problem:", problem);
+                console.log("Library:", library);
+
+                if (
+                    location && cloudOption && cloudUsage &&
+                    hardware && memory && resources &&
+                    modality && task && problem &&
+                    domain && library !== "Loading libraries..." && language
+                ) {
+                    document.getElementById("submit-btn").disabled = false;
+                    document.getElementById("submit-btn").style.backgroundColor = "#007BFF";
+                    document.getElementById("submit-btn").style.cursor = "pointer";
+                    console.log("✅ Form is complete! Submit button is enabled.");
+                } else {
+                    document.getElementById("submit-btn").disabled = true;
+                    document.getElementById("submit-btn").style.backgroundColor = "gray";
+                    document.getElementById("submit-btn").style.cursor = "not-allowed";
+                    console.log("❌ Form is incomplete! Submit button is still disabled.");
+                }
+            }
 
 
-        document.getElementById('modality-select').addEventListener('change', function() {
-            const selectedModality = this.value;
-            loadProblemTypeOptions(selectedModality);
-        });
-
-        function loadProblemTypeOptions(modality) {
-            fetch('/filter_options', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ modality })
-            })
-            .then(response => response.json())
-            .then(options => {
-                console.log('Filtered options for modality:', options);
-                document.getElementById('problem-type-section').style.display = 'block';
-                const problemTypes = [...new Set(options.map(option => option['Problem type']))];
-                const problemTypeSelect = document.getElementById('problem-type-select');
-                problemTypeSelect.innerHTML = '<option value="">Select...</option>';
-                problemTypes.forEach(problemType => {
-                    const option = document.createElement('option');
-                    option.value = problemType;
-                    option.textContent = problemType;
-                    problemTypeSelect.appendChild(option);
-                });
-                problemTypeSelect.addEventListener('change', function() {
-                    const selectedProblemType = this.value;
-                    loadEvaluationMetricsOptions(modality, selectedProblemType);
-                });
-            })
-            .catch(error => {
-                console.error('Failed to fetch filtered options:', error);
+            
+            document.querySelectorAll(".inferior-grid select").forEach(select => {
+                select.addEventListener("change", checkFormCompletion);
             });
+
+            
+            function ensureDropdownsLoaded() {
+                setTimeout(() => {
+                    checkFormCompletion();
+                }, 2000); 
+            }
+
+            
+            function populateDropdowns(csvText) {
+                const rows = csvText.split("\n").map(row => row.split(","));
+
+                const taskSelect = document.getElementById("task-select");
+                const problemSelect = document.getElementById("problem-select");
+                const librarySelect = document.getElementById("library-select");
+
+                // Clear previous options
+                taskSelect.innerHTML = '<option value="">Select a Task</option>';
+                problemSelect.innerHTML = '<option value="">Select a Problem Definition</option>';
+                librarySelect.innerHTML = '<option value="">Select a Library</option>';
+
+                const taskMap = new Map();
+                const librarySet = new Set(); // Use a Set for unique libraries
+
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i].map(col => col.trim());
+                    if (columns.length < 3) continue;
+
+                    const task = columns[0];
+                    const problem = columns[1];
+                    const library = columns[3];
+
+                    if (!taskMap.has(task)) {
+                        taskMap.set(task, new Set());
+                    }
+                    if (problem) {
+                        taskMap.get(task).add(problem);
+                    }
+                    if (library) {
+                        librarySet.add(library);
+                    }
+                }
+
+                // Populate Task Dropdown
+                taskMap.forEach((_, task) => {
+                    const option = document.createElement("option");
+                    option.value = task;
+                    option.textContent = task;
+                    taskSelect.appendChild(option);
+                });
+
+                // Populate Library Dropdown
+                librarySet.forEach(library => {
+                    const option = document.createElement("option");
+                    option.value = library;
+                    option.textContent = library;
+                    librarySelect.appendChild(option);
+                });
+
+                // Enable Problem Definition dropdown when Task is selected
+                taskSelect.addEventListener("change", function () {
+                    const selectedTask = taskSelect.value;
+                    problemSelect.innerHTML = '<option value="">Select a Problem Definition</option>';
+                    problemSelect.disabled = selectedTask === "";
+
+                    if (taskMap.has(selectedTask)) {
+                        taskMap.get(selectedTask).forEach(problem => {
+                            const option = document.createElement("option");
+                            option.value = problem;
+                            option.textContent = problem;
+                            problemSelect.appendChild(option);
+                        });
+                    }
+                    checkFormCompletion();
+                });
+
+                // Ensure validation runs again after loading data
+                ensureDropdownsLoaded();
+            }
+
+            
+            fetch("huggingface_models.csv")
+                .then(response => response.text())
+                .then(csvText => populateDropdowns(csvText))
+                .catch(error => console.error("Error loading CSV file:", error));
+
+            document.getElementById("submit-btn").addEventListener("click", function () {
+                const submitButton = document.getElementById("submit-btn");
+                const resultedModel = document.getElementById("resulted-model");
+
+                console.log("Submit button clicked!"); // Debugging log
+
+                if (!submitButton.disabled) {
+                    console.log("✅ Submit event triggered!"); // Debugging log
+
+                    
+                    document.getElementById("model-name").textContent = "Suggested AI Model"; // Placeholder name
+                    document.getElementById("model-task").textContent = document.getElementById("task-select").value;
+                    document.getElementById("model-problem").textContent = document.getElementById("problem-select").value;
+                    document.getElementById("model-hardware").textContent = document.querySelector("#hardware select:nth-of-type(1)").value;
+                    document.getElementById("model-language").textContent = document.querySelector("#optional select:nth-of-type(3)").value;
+
+                    
+                    resultedModel.classList.remove("hidden"); // Remove hidden class
+                    resultedModel.style.display = "block"; // Ensure visibility
+
+                    console.log("✅ Resulted Model is now visible!"); // Debugging log
+                } else {
+                    console.log("❌ Submit button is still disabled.");
+                }
+            });
+
+        });
+
+        document.getElementById("file-input").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+
+            if (file) {
+                // Hide "No data selected yet."
+                document.getElementById("no-data-text").classList.add("hidden");
+
+                // Enable Submit Button
+                document.getElementById("submit-btn").disabled = false;
+                document.getElementById("submit-btn").style.cursor = "pointer";
+                document.getElementById("submit-btn").style.backgroundColor = "#007BFF";
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const text = e.target.result;
+                    const rows = text.split("\n").map(row => row.split(",")); // CSV parsing
+
+                    const tableHeader = document.getElementById("table-header");
+                    const tableBody = document.getElementById("table-body");
+
+                    // Clear existing table content
+                    tableHeader.innerHTML = "";
+                    tableBody.innerHTML = "";
+
+                    if (rows.length > 0) {
+                        // Populate header row
+                        rows[0].forEach(header => {
+                            let th = document.createElement("th");
+                            th.textContent = header;
+                            tableHeader.appendChild(th);
+                        });
+
+                        // Populate table rows
+                        for (let i = 1; i < rows.length; i++) {
+                            if (rows[i].length > 1) { // Ignore empty rows
+                                let tr = document.createElement("tr");
+
+                                // Add checkbox in first column
+                                let tdCheckbox = document.createElement("td");
+                                let checkbox = document.createElement("input");
+                                checkbox.type = "checkbox";
+                                tdCheckbox.appendChild(checkbox);
+                                tr.appendChild(tdCheckbox);
+
+                                // Add other data cells
+                                rows[i].forEach(cell => {
+                                    let td = document.createElement("td");
+                                    td.textContent = cell;
+                                    tr.appendChild(td);
+                                });
+
+                                tableBody.appendChild(tr);
+                            }
+                        }
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+
+
+        //  Select All & Deselect All Functionality
+        document.getElementById("select-all").addEventListener("click", function () {
+            document.querySelectorAll("#table-body tr input[type='checkbox']").forEach(checkbox => {
+                checkbox.checked = true;
+            });
+        });
+
+        document.getElementById("deselect-all").addEventListener("click", function () {
+            document.querySelectorAll("#table-body tr input[type='checkbox']").forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+
+        document.getElementById("deselect-all").addEventListener("click", function () {
+            document.querySelectorAll("#table-body tr input[type='checkbox']").forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+
+
+        function displayCSVData(csv) {
+            const rows = csv.split("\n").map(row => row.split(","));
+            const tableHeader = document.getElementById("table-header");
+            const tableBody = document.getElementById("table-body");
+
+            // Clear previous data
+            tableHeader.innerHTML = "";
+            tableBody.innerHTML = "";
+
+            // Insert Headers
+            const headerRow = document.createElement("tr");
+            rows[0].forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header.trim();
+                headerRow.appendChild(th);
+            });
+            tableHeader.appendChild(headerRow);
+
+            // Insert Rows
+            rows.slice(1).forEach(row => {
+                const tr = document.createElement("tr");
+                row.forEach(cell => {
+                    const td = document.createElement("td");
+                    td.textContent = cell.trim();
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+
+            // Adjust table width dynamically
+            const table = document.getElementById("data-table");
+            table.style.width = "auto";
+
+            // Make data-selection section visible
+            document.getElementById("data-selection").classList.remove("empty");
         }
 
-        function loadEvaluationMetricsOptions(modality, problemType) {
-            fetch('/filter_options', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ modality, problem_type: problemType })
-            })
-            .then(response => response.json())
-            .then(options => {
-                console.log('Filtered options for modality and problem type:', options);
-                document.getElementById('evaluation-metrics-section').style.display = 'block';
-                const evaluationMetrics = [...new Set(options.map(option => option['Evaluation metrics']))];
-                const evaluationMetricsSelect = document.getElementById('evaluation-metrics-select');
-                evaluationMetricsSelect.innerHTML = '<option value="">Select...</option>';
-                evaluationMetrics.forEach(evaluationMetric => {
-                    const option = document.createElement('option');
-                    option.value = evaluationMetric;
-                    option.textContent = evaluationMetric;
-                    evaluationMetricsSelect.appendChild(option);
-                });
-                evaluationMetricsSelect.addEventListener('change', function() {
-                    const selectedEvaluationMetric = this.value;
-                    loadModelOptions(modality, problemType, selectedEvaluationMetric);
-                });
-            })
-            .catch(error => {
-                console.error('Failed to fetch filtered options:', error);
-            });
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebarTitle = document.querySelector(".sidebar h2"); // Sidebar title
+            const sidebarText = document.querySelector(".sidebar p"); // Sidebar text content
 
-        function loadModelOptions(modality, problemType, evaluationMetric) {
-            fetch('/filter_options', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ modality, problem_type: problemType, evaluation_metrics: evaluationMetric })
-            })
-            .then(response => response.json())
-            .then(options => {
-                console.log('Filtered options for modality, problem type, and evaluation metric:', options);
-                document.getElementById('model-section').style.display = 'block';
-                const models = [...new Set(options.map(option => option['Model']))];
-                const modelSelect = document.getElementById('model-select');
-                modelSelect.innerHTML = '<option value="">Select...</option>';
-                models.forEach(model => {
-                    const option = document.createElement('option');
-                    option.value = model;
-                    option.textContent = model;
-                    modelSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Failed to fetch filtered options:', error);
-            });
-        }
-
-        // Handle the environment submission
-        document.getElementById('submit-environment').addEventListener('click', function() {
-            const hardware = document.getElementById('hardware-input').value;
-            const cloudLocal = document.getElementById('cloud-local-select').value;
-            const location = document.getElementById('location-input').value;
-
-            // Handle the environment data submission (e.g., send it to your server)
-            const environmentData = {
-                hardware,
-                cloudLocal,
-                location
+            // Define descriptions for each section
+            const gridDescriptions = {
+                "geo-location": {
+                    title: "Geo Location",
+                    text: "Define your location, cloud/local settings, and cloud availability."
+                },
+                "hardware": {
+                    title: "Hardware Availability",
+                    text: "Select your preferred hardware (GPU, CPU, TPU, memory)."
+                },
+                "goal-domain": {
+                    title: "Goal & Domain",
+                    text: "Choose data modality, task type, and problem definition."
+                },
+                "optional": {
+                    title: "Optional Details",
+                    text: "Provide additional details like domain, libraries, and programming language."
+                },
+                "data-source": {
+                    title: "Data Source",
+                    text: "Upload or search for data to begin the process."
+                },
+                "data-selection": {
+                    title: "Data Selection",
+                    text: "Select the data you want to use for model training."
+                }
             };
 
-            console.log('Environment Data:', environmentData);
-            // Here you would typically send the data to your server using fetch or another method
+            // Attach event listeners to each grid section
+            document.querySelectorAll(".grid-item").forEach(grid => {
+                grid.addEventListener("mouseenter", function () {
+                    const gridId = this.id;
+                    if (gridDescriptions[gridId]) {
+                        sidebarTitle.textContent = gridDescriptions[gridId].title;
+                        sidebarText.textContent = gridDescriptions[gridId].text;
+                    }
+                });
+
+                grid.addEventListener("mouseleave", function () {
+                    sidebarTitle.textContent = "About the System"; // Reset title
+                    sidebarText.textContent = "Hover over a section to see details."; // Reset text
+                });
+            });
         });
+
+            // Path to the CSV file stored in your system
+            const csvFilePath = "huggingface_models.csv";
+
+            // Function to fetch and process the CSV file
+            fetch(csvFilePath)
+                .then(response => response.text())
+                .then(csvText => populateDropdowns(csvText))
+                .catch(error => console.error("Error loading CSV file:", error));
+
+            function populateDropdowns(csvText) {
+                const rows = csvText.split("\n").map(row => row.split(","));
+
+                const taskSelect = document.getElementById("task-select");
+                const problemSelect = document.getElementById("problem-select");
+                const librarySelect = document.getElementById("library-select");
+
+                // Clear previous options
+                taskSelect.innerHTML = '<option value="">Select a Task</option>';
+                problemSelect.innerHTML = '<option value="">Select a Problem Definition</option>';
+                librarySelect.innerHTML = '<option value="">Select a Library</option>';
+
+                const taskMap = new Map();
+                const librarySet = new Set(); // Use a Set for unique libraries
+
+                for (let i = 1; i < rows.length; i++) { // Skip header row
+                    const columns = rows[i].map(col => col.trim()); // Trim spaces
+                    if (columns.length < 3) continue; // Ignore rows with missing data
+
+                    const task = columns[0]; // First column: Task
+                    const problem = columns[1]; // Second column: Problem Definition
+                    const library = columns[3]; // Third column: Library
+
+                    if (!taskMap.has(task)) {
+                        taskMap.set(task, new Set()); // Use Set to prevent duplicate problems per task
+                    }
+                    if (problem) {
+                        taskMap.get(task).add(problem);
+                    }
+                    if (library) {
+                        librarySet.add(library); // Add libraries to unique set
+                    }
+                }
+
+                // Populate Task Dropdown (Unique Values Only)
+                taskMap.forEach((_, task) => {
+                    const option = document.createElement("option");
+                    option.value = task;
+                    option.textContent = task;
+                    taskSelect.appendChild(option);
+                });
+
+                // Populate Library Dropdown (Unique Values Only)
+                librarySet.forEach(library => {
+                    const option = document.createElement("option");
+                    option.value = library;
+                    option.textContent = library;
+                    librarySelect.appendChild(option);
+                });
+
+           
+                    function ensureDropdownsLoaded() {
+                        setTimeout(() => {
+                            checkFormCompletion();
+                        }, 2000); 
+                    }
+
+                    //  Run dropdown check when libraries are loaded
+                    document.getElementById("library-select").addEventListener("change", ensureDropdownsLoaded);
+                    document.getElementById("task-select").addEventListener("change", ensureDropdownsLoaded);
+                    document.getElementById("problem-select").addEventListener("change", ensureDropdownsLoaded);
+
+
+                // Update Problem Definition based on Task Selection
+                taskSelect.addEventListener("change", function() {
+                    const selectedTask = taskSelect.value;
+                    problemSelect.innerHTML = '<option value="">Select a Problem Definition</option>';
+                    problemSelect.disabled = selectedTask === "";
+
+                    if (taskMap.has(selectedTask)) {
+                        taskMap.get(selectedTask).forEach(problem => {
+                            const option = document.createElement("option");
+                            option.value = problem;
+                            option.textContent = problem;
+                            problemSelect.appendChild(option);
+                        });
+                    }
+                });
+            }
+
+
     </script>
 </body>
 </html>
+
